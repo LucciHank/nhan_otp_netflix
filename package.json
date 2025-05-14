@@ -4,7 +4,7 @@
   "description": "Hệ Thống Nhận OTP Hộ Gia Đình TomOi.vn",
   "main": "index.js",
   "engines": {
-    "node": "16.x"
+    "node": "18.x"
   },
   "scripts": {
     "start": "node index.js",
