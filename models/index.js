@@ -5,7 +5,15 @@ const { Sequelize } = require('sequelize');
 let sequelize;
 
 try {
-  if (process.env.DATABASE_URL) {
+  // Kiểm tra xem có cần dùng SQLite không (cho phép fallback)
+  if (process.env.USE_SQLITE === 'true') {
+    console.log('Sử dụng SQLite theo cấu hình');
+    sequelize = new Sequelize({
+      dialect: 'sqlite',
+      storage: './data.sqlite',
+      logging: false
+    });
+  } else if (process.env.DATABASE_URL) {
     // Sử dụng URL kết nối PostgreSQL trong môi trường production
     console.log('Kết nối tới PostgreSQL thông qua DATABASE_URL');
     sequelize = new Sequelize(process.env.DATABASE_URL, {
@@ -16,7 +24,13 @@ try {
           rejectUnauthorized: false
         }
       },
-      logging: process.env.NODE_ENV !== 'production'
+      logging: process.env.NODE_ENV !== 'production',
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+      }
     });
   } else if (process.env.DB_HOST) {
     // Sử dụng cấu hình PostgreSQL local
