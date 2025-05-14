@@ -11,6 +11,7 @@ const nodemailer = require('nodemailer');
 const net = require('net');
 const tls = require('tls');
 const { EventEmitter } = require('events');
+const { Sequelize } = require('sequelize');
 
 const app = express();
 
@@ -371,33 +372,33 @@ app.get('/results', async (req, res) => {
   const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
   
   try {
-    const otps = await Otp.findAll({ 
-      where: {
-        receivedAt: { [require('sequelize').Op.gte]: thirtyMinutesAgo }
+  const otps = await Otp.findAll({ 
+    where: {
+      receivedAt: { [require('sequelize').Op.gte]: thirtyMinutesAgo }
         // Bỏ điều kiện lọc theo from để có thể tìm từ tất cả các địa chỉ Netflix
-      },
-      include: [{
-        model: MailAccount,
-        where: { email: email }
-      }],
-      order: [['receivedAt', 'DESC']]
-    });
-    
-    if (otps.length === 0) {
-      return res.render('result', { 
-        title: 'Kết Quả Tìm Kiếm OTP', 
-        error: 'Không tìm thấy mã OTP cho email này trong 30 phút qua',
-        email: maskedEmail,
-        otps: []
-      });
-    }
-    
-    res.render('result', { 
-      title: 'Kết Quả Tìm Kiếm OTP',
-      error: null,
+    },
+    include: [{
+      model: MailAccount,
+      where: { email: email }
+    }],
+    order: [['receivedAt', 'DESC']]
+  });
+  
+  if (otps.length === 0) {
+    return res.render('result', { 
+      title: 'Kết Quả Tìm Kiếm OTP', 
+      error: 'Không tìm thấy mã OTP cho email này trong 30 phút qua',
       email: maskedEmail,
-      otps: otps
+      otps: []
     });
+  }
+  
+  res.render('result', { 
+    title: 'Kết Quả Tìm Kiếm OTP',
+    error: null,
+    email: maskedEmail,
+    otps: otps
+  });
   } catch (error) {
     console.error('Lỗi khi tìm OTP:', error);
     return res.render('result', { 
@@ -612,11 +613,11 @@ async function fetchFromAccount(acc) {
   
   // Xử lý đặc biệt cho Gmail
   let popConfig = {
-    user: acc.user,
-    password: acc.pass,
-    host: acc.host,
+      user: acc.user,
+      password: acc.pass,
+      host: acc.host,
     port: acc.port || 995,
-    tls: true
+      tls: true
   };
 
   // Xác định nếu là Gmail và thay đổi cấu hình nếu cần
@@ -687,10 +688,10 @@ async function fetchFromAccount(acc) {
         console.log(`Đã lấy nội dung email #${msg.num}, đang phân tích...`);
         
         const parsed = await simpleParser(emailContent);
-        const emailText = parsed.text || '';
+      const emailText = parsed.text || '';
         const emailHtml = parsed.html || '';
-        const emailSubject = parsed.subject || '';
-        
+      const emailSubject = parsed.subject || '';
+      
         // Xác định người gửi email
         let fromEmail = '';
         if (parsed.from) {
@@ -784,7 +785,7 @@ async function fetchFromAccount(acc) {
             emailText.toLowerCase().includes('update household')
           ) {
             otpType = 'Xác minh hộ gia đình';
-            
+        
             // Tạo mảng các pattern để tìm URL xác minh hộ gia đình
             const householdVerificationPatterns = [
               // Pattern 1: Tìm tag <a> với text "Đúng, đây là tôi"
@@ -815,7 +816,7 @@ async function fetchFromAccount(acc) {
             emailSubject.toLowerCase().includes('đăng nhập') ||
             emailText.toLowerCase().includes('sign in') ||
             emailText.toLowerCase().includes('đăng nhập')
-          ) {
+        ) {
             otpType = 'Xác minh đăng nhập';
             
             // Đầu tiên tìm OTP (nếu có)
@@ -868,22 +869,22 @@ async function fetchFromAccount(acc) {
                 console.log(`Tìm thấy URL Netflix: ${verificationLink.substring(0, 50)}...`);
               }
             }
-          }
-          
-          // Lưu vào database
+        }
+        
+        // Lưu vào database
           if (otpCode || verificationLink) {
             // Với email đặt lại mật khẩu, luôn đảm bảo dùng mã VERIFY (không dùng số ngẫu nhiên)
             const finalCode = otpType === 'Đặt lại mật khẩu' ? 'VERIFY' : (otpCode || 'VERIFY');
             
-            await Otp.create({
+        await Otp.create({
               code: finalCode,
               from: fromEmail,
-              type: otpType,
-              receivedAt: parsed.date,
+          type: otpType,
+          receivedAt: parsed.date,
               MailAccountId: acc.id,
               verificationLink: verificationLink
-            });
-            
+        });
+        
             console.log(`Đã lưu thông tin email Netflix - Loại: ${otpType}, Email: ${acc.email}, Từ: ${fromEmail}`);
           } else {
             console.log(`Email từ Netflix nhưng không tìm thấy OTP hoặc liên kết xác minh`);
@@ -928,8 +929,29 @@ cron.schedule(`*/${interval} * * * * *`, async () => {
 
 // Khởi động
 (async () => {
+  // Cấu hình cơ sở dữ liệu
+  let sequelize;
+  if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
+    // Khi triển khai trên Railway hoặc platform khác
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
+      dialect: 'postgres',
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false
+        }
+      }
+    });
+  } else {
+    // Môi trường phát triển - sử dụng SQLite
+    sequelize = new Sequelize({
+      dialect: 'sqlite',
+      storage: 'data.sqlite'
+    });
+  }
   await sequelize.sync();
-  app.listen(process.env.PORT||3000, ()=>{
-    console.log(`Server chạy tại http://localhost:${process.env.PORT||3000}`);
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server đang chạy tại http://localhost:${PORT}`);
   });
 })();

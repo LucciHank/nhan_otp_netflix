@@ -13,7 +13,7 @@
       
       <!-- Đầu -->
       <ellipse cx="400" cy="300" rx="180" ry="180" fill="#FF5F1F"/>
-      
+  
       <!-- Mũ lưỡi trai -->
       <path d="M400,170c-70,0-140,30-140,65c0,30,50,60,140,60s140-30,140-60C540,200,470,170,400,170z" fill="#1E3F8B"/>
       <path d="M400,170c-20,0-40,2-60,5v53c20,5,40,7,60,7s40-2,60-7v-53C440,172,420,170,400,170z" fill="#1E3F8B"/>
@@ -22,13 +22,13 @@
       <!-- Logo trên mũ -->
       <rect x="380" y="195" width="40" height="40" rx="5" fill="#FFFFFF"/>
       <path d="M390,205c0,0,10,10,20,0c0,0,5,15-10,25C400,230,385,220,390,205z" fill="#1E3F8B"/>
-      
+  
       <!-- Áo -->
       <path d="M310,460c0,0,30,40,90,40s90-40,90-40v100c0,0-30,40-90,40s-90-40-90-40V460z" fill="#1E3F8B"/>
       
       <!-- Chữ TOM trên áo -->
       <text x="400" y="510" font-family="Arial" font-size="40" font-weight="bold" text-anchor="middle" fill="#FFFFFF">TOM</text>
-      
+  
       <!-- Áo kết hợp -->
       <path d="M310,460c0,0,30-40,90-40s90,40,90,40c0,0-30,40-90,40S310,460,310,460z" fill="#FFFFFF"/>
       
@@ -55,7 +55,7 @@
       <ellipse cx="370" cy="595" rx="80" ry="20" fill="#FFFFFF"/>
       <path d="M310,595c0,0,10-50,60-50s60,50,60,50" fill="none" stroke="#FF0000" stroke-width="5"/>
       <path d="M310,595c0,0,0-50,60-50s60,50,60,50" fill="#FFFFFF" stroke="#FF0000" stroke-width="5"/>
-      
+  
       <!-- Các hạt bắp rang -->
       <ellipse cx="350" cy="560" rx="10" ry="10" fill="#FFD700"/>
       <ellipse cx="370" cy="540" rx="10" ry="10" fill="#FFD700"/>
