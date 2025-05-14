@@ -1,0 +1,103 @@
+<!-- Edit Account Page -->
+<div class="max-w-3xl mx-auto">
+  <!-- Back button -->
+  <div class="mb-6">
+    <a href="/admin/accounts" class="inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition duration-200">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Quay lại danh sách tài khoản
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="text-xl">Chỉnh Sửa Tài Khoản Email</h2>
+    </div>
+    <div class="card-body">
+      <!-- Error message -->
+      <% if (err) { %>
+        <div class="bg-red-900/50 text-red-300 p-3 rounded-md mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          <%= err %>
+        </div>
+      <% } %>
+
+      <!-- Edit form -->
+      <form method="post" action="/admin/accounts/edit/<%= account.id %>" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+          <input 
+            name="email" 
+            placeholder="Nhập địa chỉ email" 
+            class="w-full px-3 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-netflix-red"
+            value="<%= account.email %>"
+            required
+          />
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">IMAP User</label>
+          <input 
+            name="user" 
+            placeholder="Tên đăng nhập IMAP" 
+            class="w-full px-3 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-netflix-red"
+            value="<%= account.user %>"
+            required
+          />
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Mật khẩu</label>
+          <input 
+            name="pass" 
+            type="password" 
+            placeholder="Mật khẩu hoặc mật khẩu ứng dụng" 
+            class="w-full px-3 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-netflix-red"
+            value="<%= account.pass %>"
+            required
+          />
+          <p class="text-gray-400 text-sm mt-1">Nhập lại mật khẩu hoặc nhập mật khẩu mới nếu muốn thay đổi</p>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Host</label>
+            <input 
+              name="host" 
+              placeholder="IMAP Host" 
+              class="w-full px-3 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-netflix-red"
+              value="<%= account.host %>"
+              required
+            />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Port</label>
+            <input 
+              name="port" 
+              placeholder="IMAP Port" 
+              class="w-full px-3 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-netflix-red"
+              value="<%= account.port %>"
+              required
+            />
+          </div>
+        </div>
+        
+        <div class="flex justify-between pt-4">
+          <a href="/admin/accounts" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition duration-200">
+            Hủy
+          </a>
+          <button 
+            type="submit" 
+            class="px-6 py-2 bg-netflix-red hover:bg-red-700 text-white font-medium rounded-md transition duration-200"
+          >
+            Lưu thay đổi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

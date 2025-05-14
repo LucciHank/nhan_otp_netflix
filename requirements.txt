@@ -1,0 +1,24 @@
+# Node.js project - dependencies defined in package.json
+# This file is just for information purposes
+
+# Core dependencies
+express==4.18.2
+ejs==3.1.9
+express-ejs-layouts==2.5.1
+express-session==1.17.3
+bcryptjs==2.4.3
+dotenv==16.3.1
+
+# Email related
+nodemailer==6.9.9
+mailparser==3.6.5
+
+# Database
+sequelize==6.33.0
+sqlite3==5.1.6
+
+# Scheduling
+node-cron==3.0.2
+
+# Development dependencies
+nodemon==3.0.1 

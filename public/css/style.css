@@ -1,0 +1,147 @@
+:root {
+  --netflix-red: #E50914;
+  --netflix-dark: #221F1F;
+  --netflix-light: #F5F5F1;
+}
+
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--netflix-dark);
+  color: var(--netflix-light);
+  margin: 0;
+  padding: 0;
+}
+
+.navbar {
+  background-color: var(--netflix-dark);
+  padding: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.netflix-logo {
+  height: 40px;
+}
+
+.title {
+  color: var(--netflix-light);
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.card {
+  background-color: #2D2D2D;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  background-color: var(--netflix-red);
+  padding: 1rem;
+  color: white;
+  font-weight: bold;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.otp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.otp-table th {
+  background-color: rgba(229, 9, 20, 0.9);
+  color: white;
+  text-align: left;
+  padding: 12px 15px;
+}
+
+.otp-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #444;
+}
+
+.otp-table tr:last-child td {
+  border-bottom: none;
+}
+
+.otp-table tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.otp-code {
+  font-family: 'Courier New', monospace;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--netflix-red);
+}
+
+.mascot-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.mascot-image {
+  max-height: 200px;
+}
+
+.otp-time {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  border-top: 1px solid #444;
+  color: #999;
+}
+
+.refresh-button {
+  background-color: var(--netflix-red);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.refresh-button:hover {
+  background-color: #c70b0b;
+}
+
+@media (max-width: 768px) {
+  .mascot-image {
+    max-height: 150px;
+  }
+  
+  .otp-table th, .otp-table td {
+    padding: 8px 10px;
+  }
+  
+  .otp-code {
+    font-size: 1.1rem;
+  }
+}

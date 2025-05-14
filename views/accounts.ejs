@@ -1,0 +1,323 @@
+<!-- No layout directive needed as it's set globally in index.js -->
+<div class="mb-6 flex justify-between items-center">
+  <h2 class="text-xl font-bold">Quản Lý Tài Khoản Mail</h2>
+  <div class="flex space-x-3">
+    <a href="/admin/dashboard" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition duration-200">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      Dashboard
+    </a>
+    <a href="/" target="_blank" class="px-4 py-2 bg-netflix-red hover:bg-red-700 text-white rounded transition duration-200">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+      Trang chủ
+    </a>
+  </div>
+</div>
+
+<% if (err) { %>
+  <div class="bg-red-900/50 text-red-300 p-3 rounded-md mb-4">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+    </svg>
+    <%= err %>
+  </div>
+<% } %>
+
+<% if (success) { %>
+  <div class="bg-green-900/50 text-green-300 p-3 rounded-md mb-4">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+    </svg>
+    <%= success %>
+  </div>
+<% } %>
+
+<!-- Modal kết quả kiểm tra -->
+<div id="testResultModal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center">
+  <div class="bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold text-netflix-light">Kết Quả Kiểm Tra Kết Nối</h2>
+      <button onclick="closeTestModal()" class="text-gray-400 hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div id="testModalContent" class="mt-4">
+      <div class="animate-pulse flex space-x-4 mb-4">
+        <div class="flex-1 space-y-4 py-1">
+          <div class="h-4 bg-gray-700 rounded w-3/4"></div>
+          <div class="space-y-2">
+            <div class="h-4 bg-gray-700 rounded"></div>
+            <div class="h-4 bg-gray-700 rounded w-5/6"></div>
+          </div>
+        </div>
+      </div>
+      <p class="text-gray-300">Đang kiểm tra kết nối. Quá trình này có thể mất đến 30 giây...</p>
+    </div>
+    <div class="mt-6 text-right">
+      <button onclick="closeTestModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition duration-200">
+        Đóng
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="grid md:grid-cols-2 gap-6">
+  <!-- Danh sách tài khoản -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="text-lg">Danh Sách Tài Khoản</h3>
+    </div>
+    <div class="card-body">
+      <% if(accounts.length === 0) { %>
+        <div class="text-center py-4 text-gray-400">
+          <p>Chưa có tài khoản mail nào được thêm</p>
+        </div>
+      <% } else { %>
+        <div class="overflow-x-auto">
+          <table class="otp-table w-full">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Host</th>
+                <th>Port</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% accounts.forEach(a=>{ %>
+                <tr>
+                  <td><%= a.email %></td>
+                  <td><%= a.host %></td>
+                  <td><%= a.port %></td>
+                  <td class="flex space-x-2">
+                    <button 
+                      onclick="testAccount('<%= a.id %>')" 
+                      class="px-2 py-1 bg-green-700 hover:bg-green-600 text-white rounded text-xs">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Kiểm tra
+                    </button>
+                    
+                    <a href="/admin/accounts/edit/<%= a.id %>" class="px-2 py-1 bg-blue-700 hover:bg-blue-600 text-white rounded text-xs">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Sửa
+                    </a>
+                    
+                    <form action="/admin/accounts/delete/<%= a.id %>" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
+                      <button type="submit" class="px-2 py-1 bg-red-700 hover:bg-red-600 text-white rounded text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Xóa
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+  
+  <!-- Form thêm tài khoản -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="text-lg">Thêm Tài Khoản Mail Mới</h3>
+    </div>
+    <div class="card-body">
+      <form method="post" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+          <input 
+            name="email" 
+            placeholder="Nhập địa chỉ email" 
+            class="w-full px-3 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-netflix-red"
+            required
+          />
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">POP3 User <small>(thường là địa chỉ email đầy đủ)</small></label>
+          <input 
+            name="user" 
+            placeholder="Tên đăng nhập POP3" 
+            class="w-full px-3 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-netflix-red"
+            required
+          />
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Mật khẩu <small>(Gmail cần dùng mật khẩu ứng dụng)</small></label>
+          <input 
+            name="pass" 
+            type="password" 
+            placeholder="Mật khẩu hoặc mật khẩu ứng dụng" 
+            class="w-full px-3 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-netflix-red"
+            required
+          />
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Host</label>
+            <input 
+              name="host" 
+              placeholder="POP3 Host" 
+              class="w-full px-3 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-netflix-red"
+              value="pop.gmail.com"
+              required
+            />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Port</label>
+            <input 
+              name="port" 
+              placeholder="POP3 Port" 
+              class="w-full px-3 py-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-netflix-red"
+              value="995"
+              required
+            />
+          </div>
+        </div>
+        
+        <button 
+          type="submit" 
+          class="w-full bg-netflix-red hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-200"
+        >
+          Thêm Tài Khoản
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="mt-8 p-4 bg-blue-900/30 rounded-lg">
+  <h3 class="text-lg font-medium text-blue-300 mb-2">Hướng dẫn cấu hình Gmail</h3>
+  <ul class="list-disc list-inside space-y-2 text-gray-300">
+    <li><strong>Bật POP3 trong Gmail:</strong> Vào <a href="https://mail.google.com/mail/u/0/#settings/fwdandpop" target="_blank" class="text-blue-400 hover:underline">Cài đặt Gmail</a> > Chuyển tiếp và POP/IMAP > Bật POP cho tất cả email.</li>
+    <li><strong>Tạo mật khẩu ứng dụng:</strong> Vào <a href="https://myaccount.google.com/apppasswords" target="_blank" class="text-blue-400 hover:underline">Mật khẩu ứng dụng</a> > Chọn "Khác" > Đặt tên (ví dụ: Netflix OTP) > Tạo.</li>
+    <li><strong>Giá trị Host và Port:</strong> Đối với Gmail, sử dụng <code class="bg-gray-800 px-1 rounded">pop.gmail.com</code> và cổng <code class="bg-gray-800 px-1 rounded">995</code>.</li>
+    <li><strong>Lưu ý:</strong> Gmail có thể mất vài phút để các email mới xuất hiện trong POP3. Nếu email không hiển thị, hãy kiểm tra lại sau 5-10 phút.</li>
+  </ul>
+</div>
+
+<script>
+// Hàm kiểm tra tài khoản
+function testAccount(accountId) {
+  const modal = document.getElementById('testResultModal');
+  const modalContent = document.getElementById('testModalContent');
+  
+  // Hiển thị modal
+  modal.classList.remove('hidden');
+  
+  // Hiển thị trạng thái loading
+  modalContent.innerHTML = `
+    <div class="animate-pulse flex space-x-4 mb-4">
+      <div class="flex-1 space-y-4 py-1">
+        <div class="h-4 bg-gray-700 rounded w-3/4"></div>
+        <div class="space-y-2">
+          <div class="h-4 bg-gray-700 rounded"></div>
+          <div class="h-4 bg-gray-700 rounded w-5/6"></div>
+        </div>
+      </div>
+    </div>
+    <p class="text-gray-300">Đang kiểm tra kết nối. Quá trình này có thể mất đến 30 giây...</p>
+  `;
+  
+  // Gửi request kiểm tra
+  fetch(`/admin/accounts/test/${accountId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Thành công
+      let logsHtml = '';
+      if (data.logs && data.logs.length > 0) {
+        logsHtml = `
+          <div class="mt-4 border-t border-gray-700 pt-4">
+            <h3 class="text-lg font-medium text-white mb-2">Chi tiết kết nối:</h3>
+            <div class="bg-gray-900 p-3 rounded-lg overflow-auto max-h-[400px] font-mono text-sm">
+              ${data.logs.map(log => `<div class="py-1">${log}</div>`).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      modalContent.innerHTML = `
+        <div class="bg-green-900/30 text-green-300 p-4 rounded-lg">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="font-medium">${data.message}</p>
+          </div>
+        </div>
+        ${logsHtml}
+      `;
+    } else {
+      // Lỗi
+      let logsHtml = '';
+      if (data.logs && data.logs.length > 0) {
+        logsHtml = `
+          <div class="mt-4 border-t border-gray-700 pt-4">
+            <h3 class="text-lg font-medium text-white mb-2">Chi tiết lỗi:</h3>
+            <div class="bg-gray-900 p-3 rounded-lg overflow-auto max-h-[400px] font-mono text-sm">
+              ${data.logs.map(log => `<div class="py-1">${log}</div>`).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      modalContent.innerHTML = `
+        <div class="bg-red-900/30 text-red-300 p-4 rounded-lg">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p class="font-medium">${data.error}</p>
+          </div>
+        </div>
+        ${logsHtml}
+      `;
+    }
+  })
+  .catch(error => {
+    modalContent.innerHTML = `
+      <div class="bg-red-900/30 text-red-300 p-4 rounded-lg">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <p class="font-medium">Lỗi kết nối đến máy chủ: ${error.message}</p>
+        </div>
+      </div>
+    `;
+  });
+}
+
+// Đóng modal kết quả kiểm tra
+function closeTestModal() {
+  const modal = document.getElementById('testResultModal');
+  modal.classList.add('hidden');
+}
+</script>
+
+<div class="mt-8 text-center text-gray-500 text-sm">
+  <p>Thêm tài khoản email để nhận mã OTP và liên kết xác minh từ Netflix</p>
+  <p class="mt-1">Đối với Gmail, hãy đảm bảo đã bật POP3 và tạo mật khẩu ứng dụng</p>
+</div>

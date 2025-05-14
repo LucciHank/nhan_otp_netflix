@@ -1,0 +1,130 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+lerna-debug.log
+.pnpm-debug.log
+.npm
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+package-lock.json
+yarn.lock
+
+# Biến môi trường và cấu hình
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.development
+.env.test
+.env.production
+config.local.js
+
+# Logs
+logs
+*.log
+
+# Database files
+# data.sqlite
+# Uncomment nếu không muốn đưa database lên git
+
+# Cache và file tạm thời
+.tmp/
+.temp/
+.cache/
+.eslintcache
+.stylelintcache
+.parcel-cache
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE và Editor folders
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+*.iml
+*.ipr
+*.iws
+.settings/
+.editorconfig
+.vimrc
+.nvimrc
+*.code-workspace
+.history/
+
+# Build folders
+/dist
+/build
+/out
+/coverage
+/storybook-static
+/.next/
+/out/
+.nuxt
+.output
+.vercel
+.serverless/
+.fusebox/
+
+# Debug
+.nyc_output
+.coverage
+coverage
+.debug
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Misc
+.grunt
+bower_components
+jspm_packages
+.lock-wscript
+.node_repl_history
+.netbeans
+nbproject
+Thumbs.db
+.sass-cache/
+public/hot
+public/storage
+storage/*.key
+vendor/
+.phpunit.result.cache
+
+# Local Netlify folder
+.netlify
+
+# Cordova
+plugins/
+platforms/
+
+# Mobile
+.gradle
+*.apk
+*.aab
+*.ipa
+*.xcodeproj
+
+# Private
+secrets.json
+tokens.json
+credentials.json 

@@ -1,0 +1,196 @@
+<!-- Add link to dedicated loading.css for better styling -->
+<link rel="stylesheet" href="/css/loading.css">
+
+<!-- Loading page with animation while waiting for OTP check -->
+<div class="loading-container">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-netflix-light mb-4">Đang tìm kiếm mã OTP</h1>
+    <p class="text-xl text-gray-300">Email: <span class="font-mono"><%= email %></span></p>
+  </div>
+
+  <!-- Loading animation -->
+  <div class="mb-10">
+    <div class="loading-animation mb-8">
+      <!-- Netflix N Animation -->
+      <div class="netflix-n">
+        <svg viewBox="0 0 111 30" class="h-16 w-auto text-netflix-red" fill="currentColor">
+          <path d="M105.062 14.28L111 30c-1.75-.25-3.499-.563-5.28-.845l-3.345-8.686-3.437 7.969c-1.687-.282-3.344-.376-5.031-.595l6.031-13.75L94.468 0h5.063l3.062 7.874L105.875 0h5.124l-5.937 14.28zM90.47 0h-4.594v27.25c1.5.094 3.062.156 4.594.343V0zm-8.563 26.937c-4.187-.281-8.375-.53-12.656-.625V0h4.687v21.875c2.688.062 5.375.28 7.969.405v4.657zM64.25 10.657v4.687h-6.406V26H53.22V0h13.125v4.687h-8.5v5.97h6.406zm-18.906-5.97V26.25c-1.563 0-3.156 0-4.688.062V4.687h-4.844V0h14.406v4.687h-4.874zM30.75 15.593c-2.062 0-4.5 0-6.25.095v6.968c2.75-.188 5.5-.406 8.281-.5v4.5l-12.968 1.032V0H32.78v4.687H24.5V11c1.813 0 4.594-.094 6.25-.094v4.688zM4.78 12.968v16.375C3.094 29.531 1.593 29.75 0 30V0h4.469l6.093 17.032V0h4.688v28.062c-1.656.282-3.344.376-5.125.625L4.78 12.968z"></path>
+        </svg>
+      </div>
+      <div class="loading-spinner"></div>
+    </div>
+    
+    <p class="text-gray-400 mb-4">Đang tìm kiếm mã OTP từ Netflix, vui lòng chờ...</p>
+    <div class="progress-container">
+      <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+    </div>
+    <div class="countdown-wrapper">
+      <p id="countdown" class="countdown">30</p>
+      <p class="text-sm text-gray-400">giây còn lại</p>
+    </div>
+  </div>
+
+  <div class="info-container">
+    <h2 class="text-xl font-bold text-white mb-4">Trạng thái kiểm tra</h2>
+    <div id="status-container" class="p-4 bg-gray-800 rounded-lg mb-4">
+      <p id="status-message" class="text-gray-300">Đang kết nối với máy chủ và kiểm tra email...</p>
+      <div id="otp-result" class="hidden mt-4 p-3 bg-gray-700 rounded-lg">
+        <h3 class="text-lg font-bold text-netflix-red">Đã tìm thấy OTP!</h3>
+        <p class="text-white">Mã OTP: <span id="otp-code" class="font-mono font-bold text-xl">------</span></p>
+        <p class="text-gray-300">Loại: <span id="otp-type">---</span></p>
+      </div>
+      <div id="verification-result" class="hidden mt-4 p-3 bg-gray-700 rounded-lg">
+        <h3 class="text-lg font-bold text-netflix-red">Đã tìm thấy liên kết xác minh!</h3>
+        <div class="mt-3">
+          <a id="verify-link" href="#" target="_blank" class="flex items-center justify-center px-4 py-2 bg-netflix-red hover:bg-red-700 text-white font-bold rounded transition duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Đúng, đây là tôi
+          </a>
+        </div>
+      </div>
+    </div>
+    <p class="text-gray-400 mb-4">Hệ thống đang kiểm tra các email mới nhất để tìm mã OTP từ Netflix. Quá trình này có thể mất tối đa 30 giây.</p>
+    <p class="text-gray-400">Đôi khi email có thể đến chậm. Hệ thống sẽ cố gắng tìm mã OTP trong vòng 30 phút qua.</p>
+    
+    <!-- Mascot container with improved styling -->
+    <div class="mascot-container" style="bottom: -80px; right: -120px; width: 240px; height: 240px;">
+      <div class="mascot-speech-bubble" style="top: -50px; left: 30px; background-color: rgba(255, 255, 255, 0.95);">
+        <span id="mascot-speech">TomOi đang tìm mã OTP của bạn...</span>
+      </div>
+      <img src="/img/tomoi-mascot.svg" alt="TomOi Mascot" class="mascot" style="filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.3));">
+    </div>
+  </div>
+</div>
+
+<!-- Simple clean inline script to avoid loading issues -->
+<script>
+// Run instantly without waiting for DOMContentLoaded
+(function() {
+  console.log('Loading script started');
+  // Backup guaranteed redirect
+  setTimeout(function() {
+    window.location.href = '/results';
+  }, 31000);
+
+  // Countdown variables
+  var countdown = 30;
+  var countdownElement = document.getElementById('countdown');
+  var progressBar = document.getElementById('progress-bar');
+  var email = "<%= email %>";
+  var statusMessage = document.getElementById('status-message');
+  var otpResult = document.getElementById('otp-result');
+  var verificationResult = document.getElementById('verification-result');
+  var otpCode = document.getElementById('otp-code');
+  var otpType = document.getElementById('otp-type');
+  var verifyLink = document.getElementById('verify-link');
+  var mascotSpeech = document.getElementById('mascot-speech');
+  
+  // Mascot speech messages
+  var speechMessages = [
+    "TomOi đang tìm mã OTP của bạn...",
+    "Kiểm tra hộp thư Netflix...",
+    "Đang quét email mới nhất...",
+    "Mã OTP sẽ hiện ra trong giây lát!",
+    "Đừng lo lắng, TomOi sẽ tìm thấy mã OTP!",
+    "Chờ chút nha, Netflix đôi khi hơi chậm...",
+    "Đang kiểm tra cả liên kết xác minh hộ gia đình..."
+  ];
+  
+  // Change mascot speech occasionally
+  function changeMascotSpeech() {
+    mascotSpeech.textContent = speechMessages[Math.floor(Math.random() * speechMessages.length)];
+  }
+  
+  // Initial speech change and then every 4 seconds
+  changeMascotSpeech();
+  setInterval(changeMascotSpeech, 4000);
+  
+  // Kiểm tra OTP mỗi 5 giây
+  function checkForOtp() {
+    statusMessage.textContent = "Đang kiểm tra máy chủ cho mã OTP hoặc liên kết xác minh mới...";
+    
+    fetch('/check-otp?email=' + encodeURIComponent(email))
+      .then(response => response.json())
+      .then(data => {
+        if (data.found) {
+          // Có OTP, hiển thị và chuẩn bị redirect
+          statusMessage.textContent = "Đã tìm thấy! Đang chuyển đến trang kết quả...";
+          
+          if (data.otp.isVerification) {
+            // Hiển thị thông tin xác minh
+            verifyLink.href = data.otp.verificationLink;
+            verificationResult.classList.remove('hidden');
+            mascotSpeech.textContent = "Tuyệt quá! Đã tìm thấy liên kết xác minh hộ gia đình!";
+          } else {
+            // Hiển thị thông tin OTP
+            otpCode.textContent = data.otp.code;
+            otpType.textContent = data.otp.type;
+            otpResult.classList.remove('hidden');
+            mascotSpeech.textContent = "Tuyệt quá! Đã tìm thấy mã OTP: " + data.otp.code;
+          }
+          
+          // Đợi 3 giây để người dùng xem OTP trước khi redirect
+          setTimeout(function() {
+            window.location.href = '/results';
+          }, 3000);
+          
+          clearInterval(countdownTimer);
+          clearInterval(otpTimer);
+          clearInterval(speechTimer);
+        } else {
+          // Không tìm thấy OTP
+          if (data.error) {
+            statusMessage.textContent = "Lỗi: " + data.error;
+          } else {
+            statusMessage.textContent = "Chưa tìm thấy mã OTP hoặc liên kết xác minh, đang tiếp tục kiểm tra...";
+          }
+        }
+      })
+      .catch(err => {
+        console.error('Lỗi kiểm tra OTP:', err);
+        statusMessage.textContent = "Có lỗi khi kiểm tra. Đang thử lại...";
+      });
+  }
+
+  // Run the countdown - đã sửa lại logic
+  function updateCountdown() {
+    // Cập nhật giao diện trước khi giảm giá trị
+    countdownElement.textContent = countdown;
+    
+    // Update progress bar - calculate percentage
+    var progress = Math.floor(((30 - countdown) / 30) * 100);
+    progressBar.style.width = progress + '%';
+    
+    // Giảm countdown sau khi cập nhật giao diện
+    countdown--;
+    
+    // Handle completion
+    if (countdown < 0) {
+      clearInterval(countdownTimer);
+      clearInterval(otpTimer);
+      clearInterval(speechTimer);
+      statusMessage.textContent = "Thời gian tìm kiếm đã hết. Đang chuyển hướng đến trang kết quả...";
+      mascotSpeech.textContent = "Đang chuyển đến trang kết quả...";
+      window.location.href = '/results';
+      return;
+    }
+  }
+
+  // Chạy countdown ngay lập tức để hiển thị 30 đầu tiên
+  updateCountdown();
+  
+  // Start interval - update every second - thay đổi tên biến từ timer thành countdownTimer
+  var countdownTimer = setInterval(updateCountdown, 1000);
+  
+  // Kiểm tra OTP mỗi 5 giây
+  var otpTimer = setInterval(checkForOtp, 5000);
+  
+  // Thay đổi lời nói của mascot
+  var speechTimer = setInterval(changeMascotSpeech, 4000);
+  
+  // Chạy kiểm tra ngay lập tức
+  checkForOtp();
+})();
+</script>

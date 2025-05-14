@@ -1,0 +1,16 @@
+.tomoi-mascot-bg {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI4MCIgZmlsbD0iI0ZGNkEzMyIvPgogIDxjaXJjbGUgY3g9IjgwIiBjeT0iODAiIHI9IjEwIiBmaWxsPSJ3aGl0ZSIvPgogIDxjaXJjbGUgY3g9IjEyMCIgY3k9IjgwIiByPSIxMCIgZmlsbD0id2hpdGUiLz4KICA8Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSI1IiBmaWxsPSJibGFjayIvPgogIDxjaXJjbGUgY3g9IjEyMCIgY3k9IjgwIiByPSI1IiBmaWxsPSJibGFjayIvPgogIDxwYXRoIGQ9Ik03MCAxMjBDODUgMTQwIDExNSAxNDAgMTMwIDEyMCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjMiLz4KICA8cmVjdCB4PSI2MCIgeT0iNDAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIzMCIgZmlsbD0iIzI5ODBCOSIvPgogIDx0ZXh0IHg9IjEwMCIgeT0iNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5UT008L3RleHQ+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTUwIiByPSIyMCIgZmlsbD0iI0ZGRDcwMCIvPgo8L3N2Zz4=');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
+
+.tomoi-mascot {
+  display: block;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
