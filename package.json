@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "Hệ Thống Nhận OTP Hộ Gia Đình TomOi.vn",
   "main": "index.js",
+  "engines": {
+    "node": "16.x"
+  },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "vercel-build": "echo 'Building...'"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
