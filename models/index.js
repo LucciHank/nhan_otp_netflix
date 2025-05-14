@@ -1,10 +1,6 @@
 require('dotenv').config();
-const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './data.sqlite',
-  logging: false
-});
+// Sử dụng sequelize từ cấu hình
+const sequelize = require('../db-config');
 const MailAccount = require('./mailAccount')(sequelize);
 const Otp = require('./otp')(sequelize);
 
