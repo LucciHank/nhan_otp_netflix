@@ -11,7 +11,6 @@ const nodemailer = require('nodemailer');
 const net = require('net');
 const tls = require('tls');
 const { EventEmitter } = require('events');
-const { Sequelize } = require('sequelize');
 
 const app = express();
 
@@ -720,7 +719,7 @@ async function fetchFromAccount(acc) {
           console.log(`Tìm thấy email liên quan đến Netflix: ${fromEmail}, Tiêu đề: ${emailSubject}`);
           
           // Xác định loại email
-          let otpType = 'Hộ gia đình';
+        let otpType = 'Hộ gia đình';
           let verificationLink = null;
           let otpCode = null;
 
@@ -929,20 +928,8 @@ cron.schedule(`*/${interval} * * * * *`, async () => {
 
 // Khởi động
 (async () => {
-  // Cấu hình cơ sở dữ liệu - Sử dụng SQLite với volume
-  const dbPath = process.env.RAILWAY_VOLUME_MOUNT_PATH 
-    ? `${process.env.RAILWAY_VOLUME_MOUNT_PATH}/data.sqlite` 
-    : 'data.sqlite';
-
-  console.log(`Sử dụng cơ sở dữ liệu tại: ${dbPath}`);
-
-  const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: dbPath
-  });
   await sequelize.sync();
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server đang chạy tại http://localhost:${PORT}`);
+  app.listen(process.env.PORT||3000, ()=>{
+    console.log(`Server chạy tại http://localhost:${process.env.PORT||3000}`);
   });
 })();

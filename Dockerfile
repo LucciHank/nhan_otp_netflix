@@ -1,15 +1,12 @@
-FROM node:16
+FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package*.json ./
 
-# Sử dụng npm install thay vì npm ci
 RUN npm install
 
 COPY . .
-
-ENV NODE_ENV=production
 
 EXPOSE 3000
 
