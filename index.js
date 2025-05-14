@@ -929,26 +929,17 @@ cron.schedule(`*/${interval} * * * * *`, async () => {
 
 // Khởi động
 (async () => {
-  // Cấu hình cơ sở dữ liệu
-  let sequelize;
-  if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
-    // Khi triển khai trên Railway hoặc platform khác
-    sequelize = new Sequelize(process.env.DATABASE_URL, {
-      dialect: 'postgres',
-      dialectOptions: {
-        ssl: {
-          require: true,
-          rejectUnauthorized: false
-        }
-      }
-    });
-  } else {
-    // Môi trường phát triển - sử dụng SQLite
-    sequelize = new Sequelize({
-      dialect: 'sqlite',
-      storage: 'data.sqlite'
-    });
-  }
+  // Cấu hình cơ sở dữ liệu - Sử dụng SQLite với volume
+  const dbPath = process.env.RAILWAY_VOLUME_MOUNT_PATH 
+    ? `${process.env.RAILWAY_VOLUME_MOUNT_PATH}/data.sqlite` 
+    : 'data.sqlite';
+
+  console.log(`Sử dụng cơ sở dữ liệu tại: ${dbPath}`);
+
+  const sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: dbPath
+  });
   await sequelize.sync();
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
