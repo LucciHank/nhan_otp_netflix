@@ -17,7 +17,7 @@ Hệ thống giúp quản lý tài khoản email, tự động nhận và xử l
 ## Yêu cầu hệ thống
 
 - Node.js (v14 trở lên)
-- SQLite
+- PostgreSQL (local cho development hoặc Vercel PostgreSQL cho production)
 
 ## Cài đặt
 
@@ -51,8 +51,24 @@ Tạo file .env với các thông số sau:
 ```
 PORT=3000
 SESSION_SECRET=yoursessionsecret
-# Thêm các biến môi trường khác nếu cần
+
+# Cấu hình database - PostgreSQL
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_NAME=netflix_otp
+
+# Cấu hình email (nếu cần)
+MAIL_HOST=smtp.example.com
+MAIL_PORT=587
+MAIL_USERNAME=your_username
+MAIL_PASSWORD=your_password
 ```
+
+### Cấu hình cho Vercel
+
+Khi triển khai trên Vercel, bạn cần tạo Vercel Postgres database và thêm biến môi trường `DATABASE_URL`.
 
 ## Cấu trúc dự án
 

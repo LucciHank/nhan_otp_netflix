@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "vercel-build": "echo 'Building...'"
+    "vercel-build": "node ./scripts/migrate.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -21,8 +21,9 @@
     "mailparser": "^3.6.5",
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.9",
-    "sequelize": "^6.33.0",
-    "sqlite3": "^5.1.6"
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.33.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
