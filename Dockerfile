@@ -8,6 +8,10 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+# Thiết lập biến môi trường mặc định
+ENV SESSION_SECRET=tomoi_netflix_otp_secure_secret_key
+ENV PORT=8080
+
+EXPOSE 8080
 
 CMD ["npm", "start"] 

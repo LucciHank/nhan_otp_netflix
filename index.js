@@ -26,7 +26,7 @@ app.set('layout extractScripts', true);
 app.set('layout extractStyles', true);
 
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'tomoi_netflix_otp_secure_secret_key',
   resave: false, saveUninitialized: false
 }));
 
@@ -714,7 +714,7 @@ async function fetchFromAccount(acc) {
           emailText.toLowerCase().includes('nhập mã này để đăng nhập') ||
           emailText.toLowerCase().includes('đặt lại mật khẩu') ||
           (emailHtml && emailHtml.toLowerCase().includes('netflix'));
-        
+      
         if (isNetflixEmail) {
           console.log(`Tìm thấy email liên quan đến Netflix: ${fromEmail}, Tiêu đề: ${emailSubject}`);
           
