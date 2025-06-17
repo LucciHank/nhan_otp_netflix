@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "postinstall": "npm rebuild sqlite3"
+    "postinstall": "npm rebuild sqlite3",
+    "build": "npm install"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
