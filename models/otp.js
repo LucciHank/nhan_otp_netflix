@@ -1,14 +1,56 @@
-const { DataTypes } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
+
 module.exports = (sequelize) => {
-  return sequelize.define('Otp', {
-    code: { type: DataTypes.STRING, allowNull: false },
-    from: { type: DataTypes.STRING },
-    type: { 
-      type: DataTypes.ENUM('Hộ gia đình', 'Mã đăng nhập', 'Xác minh hộ gia đình', 'Xác minh đăng nhập', 'Đặt lại mật khẩu'), 
-      defaultValue: 'Hộ gia đình',
-      allowNull: false 
+  class Otp extends Model {
+    static associate(models) {
+      // define association here
+      Otp.belongsTo(models.MailAccount);
+    }
+  }
+  
+  Otp.init({
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
-    receivedAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-    verificationLink: { type: DataTypes.TEXT, allowNull: true }
+    code: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'Mã xác minh'
+    },
+    from: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    verificationLink: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    buttonLabel: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    profile: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    note: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    receivedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW
+    }
+  }, {
+    sequelize,
+    modelName: 'Otp',
   });
+  
+  return Otp;
 };

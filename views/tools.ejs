@@ -1,0 +1,31 @@
+<div class="max-w-6xl mx-auto">
+  <h1 class="text-3xl md:text-4xl font-bold mb-8 text-center">Danh Sách Công Cụ</h1>
+
+  <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+    <% if (tools.length === 0) { %>
+      <p class="col-span-full text-center text-gray-400">Hiện chưa có công cụ nào.</p>
+    <% } %>
+
+    <% tools.forEach(tool => { %>
+      <% const clickable = tool.enabled ? 'a' : 'div'; %>
+      <<%= clickable %> href="<%= tool.enabled ? '/' + tool.slug : '#' %>" class="relative block transform hover:-translate-y-1 transition-all duration-200">
+        <div class="card overflow-hidden">
+          <% if (tool.image) { %>
+            <img src="<%= tool.image %>" alt="<%= tool.name %>" class="w-full h-40 object-contain bg-black p-4">
+          <% } %>
+          <div class="card-body">
+            <h3 class="text-xl font-semibold mb-2"><%= tool.name %></h3>
+            <% if (tool.badge) { %>
+              <span class="inline-block bg-gray-700 text-sm px-3 py-1 rounded-full"><%= tool.badge %></span>
+            <% } %>
+          </div>
+        </div>
+        <% if (!tool.enabled) { %>
+          <div class="absolute inset-0 bg-black/70 flex items-center justify-center rounded-md">
+            <span class="text-white font-medium">Tạm ngừng</span>
+          </div>
+        <% } %>
+      </<%= clickable %>>
+    <% }) %>
+  </div>
+</div> 

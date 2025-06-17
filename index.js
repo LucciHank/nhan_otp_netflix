@@ -6,7 +6,7 @@ const path = require('path');
 const cron = require('node-cron');
 const { simpleParser } = require('mailparser');
 const expressLayouts = require('express-ejs-layouts');
-const { sequelize, MailAccount, Otp } = require('./models');
+const { sequelize, MailAccount, Otp, Tool } = require('./models');
 const nodemailer = require('nodemailer');
 const net = require('net');
 const tls = require('tls');
@@ -283,10 +283,24 @@ function requireLogin(req, res, next) {
   res.redirect('/admin/login');
 }
 
-// Trang chủ công khai - Form nhập email
+// Trang danh sách công cụ (mặc định)
 app.get('/', async (req, res) => {
+  try {
+    const tools = await Tool.findAll({ order: [['id', 'ASC']] });
+    res.render('tools', {
+      title: 'Danh Sách Công Cụ',
+      tools
+    });
+  } catch (e) {
+    console.error('Lỗi khi lấy danh sách tool:', e);
+    res.render('tools', { title: 'Danh Sách Công Cụ', tools: [] });
+  }
+});
+
+// Trang Tool xác minh hộ gia đình (OTP Netflix)
+app.get('/netflix-otp', async (req, res) => {
   res.render('home', { 
-    title: 'Hệ Thống Nhận OTP Netflix Hộ Gia Đình TomOi.vn',
+    title: 'Xác Minh Hộ Gia Đình Netflix',
     error: null,
     success: null
   });
@@ -321,15 +335,22 @@ app.get('/check-otp', async (req, res) => {
   const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
   
   try {
+    // Tìm tài khoản mail trước
+    const account = await MailAccount.findOne({
+      where: { email: email }
+    });
+    
+    if (!account) {
+      return res.json({ found: false, error: 'Không tìm thấy tài khoản email này trong hệ thống' });
+    }
+    
+    // Tìm OTP dựa trên tài khoản mail
     const otps = await Otp.findAll({ 
       where: {
-        receivedAt: { [require('sequelize').Op.gte]: thirtyMinutesAgo }
-        // Bỏ điều kiện lọc theo from để có thể tìm từ tất cả các địa chỉ Netflix
+        receivedAt: { [require('sequelize').Op.gte]: thirtyMinutesAgo },
+        type: 'Xác minh hộ gia đình',
+        MailAccountId: account.id
       },
-      include: [{
-        model: MailAccount,
-        where: { email: email }
-      }],
       order: [['receivedAt', 'DESC']],
       limit: 1
     });
@@ -338,9 +359,8 @@ app.get('/check-otp', async (req, res) => {
       return res.json({ found: false });
     }
     
-    // Chuẩn bị dữ liệu trả về tùy theo loại (OTP hoặc xác minh)
+    // Chuẩn bị dữ liệu trả về
     const otp = otps[0];
-    const isVerification = otp.type === 'Xác minh hộ gia đình';
     
     return res.json({ 
       found: true,
@@ -348,8 +368,11 @@ app.get('/check-otp', async (req, res) => {
         code: otp.code,
         type: otp.type,
         receivedAt: otp.receivedAt,
-        isVerification: isVerification,
-        verificationLink: isVerification ? otp.verificationLink : null
+        isVerification: true,
+        verificationLink: otp.verificationLink,
+        buttonLabel: otp.buttonLabel,
+        profile: otp.profile,
+        note: otp.note
       }
     });
   } catch (error) {
@@ -371,33 +394,45 @@ app.get('/results', async (req, res) => {
   const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
   
   try {
-  const otps = await Otp.findAll({ 
-    where: {
-      receivedAt: { [require('sequelize').Op.gte]: thirtyMinutesAgo }
-        // Bỏ điều kiện lọc theo from để có thể tìm từ tất cả các địa chỉ Netflix
-    },
-    include: [{
-      model: MailAccount,
+    // Tìm tài khoản mail trước
+    const account = await MailAccount.findOne({
       where: { email: email }
-    }],
-    order: [['receivedAt', 'DESC']]
-  });
-  
-  if (otps.length === 0) {
-    return res.render('result', { 
-      title: 'Kết Quả Tìm Kiếm OTP', 
-      error: 'Không tìm thấy mã OTP cho email này trong 30 phút qua',
-      email: maskedEmail,
-      otps: []
     });
-  }
-  
-  res.render('result', { 
-    title: 'Kết Quả Tìm Kiếm OTP',
-    error: null,
-    email: maskedEmail,
-    otps: otps
-  });
+    
+    if (!account) {
+      return res.render('result', { 
+        title: 'Kết Quả Tìm Kiếm OTP', 
+        error: 'Không tìm thấy tài khoản email này trong hệ thống',
+        email: maskedEmail,
+        otps: []
+      });
+    }
+    
+    // Tìm OTP dựa trên tài khoản mail
+    const otps = await Otp.findAll({ 
+      where: {
+        receivedAt: { [require('sequelize').Op.gte]: thirtyMinutesAgo },
+        type: 'Xác minh hộ gia đình',
+        MailAccountId: account.id
+      },
+      order: [['receivedAt', 'DESC']]
+    });
+    
+    if (otps.length === 0) {
+      return res.render('result', { 
+        title: 'Kết Quả Tìm Kiếm OTP', 
+        error: 'Không tìm thấy mã OTP cho email này trong 30 phút qua',
+        email: maskedEmail,
+        otps: []
+      });
+    }
+    
+    res.render('result', { 
+      title: 'Kết Quả Tìm Kiếm OTP',
+      error: null,
+      email: maskedEmail,
+      otps: otps
+    });
   } catch (error) {
     console.error('Lỗi khi tìm OTP:', error);
     return res.render('result', { 
@@ -692,204 +727,124 @@ async function fetchFromAccount(acc) {
       const emailSubject = parsed.subject || '';
       
         // Xác định người gửi email
-        let fromEmail = '';
+        let emailFrom = '';
         if (parsed.from) {
-          fromEmail = parsed.from.text || '';
+          emailFrom = parsed.from.text || '';
           // Nếu có thể lấy địa chỉ cụ thể từ đối tượng from
           if (parsed.from.value && parsed.from.value.length > 0 && parsed.from.value[0].address) {
-            fromEmail = parsed.from.value[0].address;
+            emailFrom = parsed.from.value[0].address;
           }
         }
         
-        console.log(`Email #${msg.num} từ: ${fromEmail}`);
+        console.log(`Email #${msg.num} từ: ${emailFrom}`);
         console.log(`Tiêu đề: ${emailSubject}`);
         
-        // Mở rộng bộ lọc để chấp nhận nhiều định dạng email từ Netflix
-        const isNetflixEmail = 
-          fromEmail.toLowerCase().includes('netflix') || 
-          emailSubject.toLowerCase().includes('netflix') ||
-          emailText.toLowerCase().includes('netflix code') ||
-          emailText.toLowerCase().includes('mã netflix') ||
-          emailText.toLowerCase().includes('đúng, đây là tôi') ||
-          emailText.toLowerCase().includes('nhập mã này để đăng nhập') ||
-          emailText.toLowerCase().includes('đặt lại mật khẩu') ||
-          (emailHtml && emailHtml.toLowerCase().includes('netflix'));
-      
-        if (isNetflixEmail) {
-          console.log(`Tìm thấy email liên quan đến Netflix: ${fromEmail}, Tiêu đề: ${emailSubject}`);
-          
-          // Xác định loại email
-        let otpType = 'Hộ gia đình';
-          let verificationLink = null;
+        // Xử lý email từ Netflix
+        if (emailFrom.toLowerCase().includes('netflix')) {
+          let otpType = null;
           let otpCode = null;
-
-          // 1. Kiểm tra email có chứa mã đăng nhập không
-          if (
-            emailSubject.toLowerCase().includes('mã xác minh') ||
-            emailSubject.toLowerCase().includes('verification code') ||
-            emailText.toLowerCase().includes('nhập mã này để đăng nhập') ||
-            emailText.toLowerCase().includes('enter this code to sign in')
-          ) {
-            otpType = 'Mã đăng nhập Netflix';
-            // Tìm mã OTP 4-6 số (Netflix sử dụng cả 4 và 6 số)
-            const otpMatch = emailText.match(/\b(\d{4,6})\b/);
-            if (otpMatch) {
-              otpCode = otpMatch[1];
-              console.log(`Tìm thấy mã đăng nhập: ${otpCode}`);
-            }
-          }
-          // 2. Kiểm tra email có phải là đặt lại mật khẩu không
-          else if (
-            emailSubject.toLowerCase().includes('đặt lại mật khẩu') ||
-            emailSubject.toLowerCase().includes('reset password') ||
-            emailText.toLowerCase().includes('đặt lại mật khẩu') ||
-            emailText.toLowerCase().includes('reset password')
-          ) {
-            otpType = 'Đặt lại mật khẩu';
+          let verificationLink = null;
+          let buttonLabel = null;
+          let profile = null;
+          let note = null;
+          let shouldSave = false;
+          
+          // Chỉ xử lý 2 loại email xác minh hộ gia đình
+          // 1. Email cập nhật hộ gia đình
+          if (emailText.toLowerCase().includes('cập nhật hộ gia đình') || 
+              emailText.toLowerCase().includes('update household')) {
             
-            // Tạo mảng các pattern để tìm URL đặt lại mật khẩu
-            const resetPasswordPatterns = [
-              // Pattern 1: Tìm tag <a> với text "Đặt lại mật khẩu"
-              /<a\s+[^>]*href=["']([^"']+)["'][^>]*>(?:đặt lại mật khẩu|reset password|đặt lại|reset)[^<]*?<\/a>/i,
-              
-              // Pattern 2: Tìm bất kỳ tag <a> nào có href chứa netflix.com/password
-              /<a\s+[^>]*href=["']([^"']*?netflix\.com\/password[^"']*)["'][^>]*>/i,
-              
-              // Pattern 3: Tìm bất kỳ URL nào chứa netflix.com/password
-              /href=["']([^"']*?netflix\.com\/password[^"']*)["']/i,
-              
-              // Pattern 4: Tìm thuộc tính href trong thẻ <a> có style chứa màu chữ trắng (thường là nút)
-              /<a\s+[^>]*href=["']([^"']+)["'][^>]*style=["'][^"']*color\s*:\s*(?:rgb\s*\(\s*255\s*,\s*255\s*,\s*255\s*\)|#ffffff|#fff|white)[^"']*["'][^>]*>/i,
-              
-              // Pattern 5: Tìm href trong bất kỳ thẻ <a> nào có target="_blank"
-              /<a\s+[^>]*href=["']([^"']+)["'][^>]*target=["']_blank["'][^>]*>/i
-            ];
-            
-            // Sử dụng hàm trích xuất URL
-            verificationLink = extractUrlsFromHtml(emailHtml, resetPasswordPatterns);
-            
-            if (verificationLink) {
-              console.log(`Đã tìm thấy URL đặt lại mật khẩu: ${verificationLink.substring(0, 50)}...`);
-              // Đảm bảo không sử dụng số ngẫu nhiên từ email làm mã OTP
-              otpCode = null;
-            } else {
-              console.log('Không tìm thấy URL đặt lại mật khẩu trong email');
-            }
-          }
-          // 3. Kiểm tra email có phải là xác minh hộ gia đình không
-          else if (
-            emailSubject.toLowerCase().includes('hộ gia đình') ||
-            emailSubject.toLowerCase().includes('household') ||
-            emailText.toLowerCase().includes('cập nhật hộ gia đình') ||
-            emailText.toLowerCase().includes('update household')
-          ) {
             otpType = 'Xác minh hộ gia đình';
-        
-            // Tạo mảng các pattern để tìm URL xác minh hộ gia đình
-            const householdVerificationPatterns = [
-              // Pattern 1: Tìm tag <a> với text "Đúng, đây là tôi"
-              /<a\s+[^>]*href=["']([^"']+)["'][^>]*>(?:Đúng|Yes|Confirm|Xác nhận|Verify)[^<]*?(?:tôi|me)[^<]*?<\/a>/i,
-              
-              // Pattern 2: Tìm bất kỳ tag <a> nào có href chứa update-primary-location
-              /<a\s+[^>]*href=["']([^"']*?update-primary-location[^"']*)["'][^>]*>/i,
-              
-              // Pattern 3: Tìm bất kỳ URL nào chứa update-primary-location
-              /href=["']([^"']*?update-primary-location[^"']*)["']/i,
-              
-              // Pattern 4: Tìm thuộc tính href trong thẻ <a> có style chứa màu chữ trắng (thường là nút)
-              /<a\s+[^>]*href=["']([^"']+)["'][^>]*style=["'][^"']*color\s*:\s*(?:rgb\s*\(\s*255\s*,\s*255\s*,\s*255\s*\)|#ffffff|#fff|white)[^"']*["'][^>]*>/i
-            ];
+            shouldSave = true;
             
-            // Sử dụng hàm trích xuất URL
-            verificationLink = extractUrlsFromHtml(emailHtml, householdVerificationPatterns);
-            
-            if (verificationLink) {
-              console.log(`Đã tìm thấy URL xác minh hộ gia đình: ${verificationLink.substring(0, 50)}...`);
-            } else {
-              console.log('Không tìm thấy URL xác minh hộ gia đình trong email');
-            }
-          }
-          // 4. Kiểm tra xem có phải là xác minh đăng nhập không
-          else if (
-            emailSubject.toLowerCase().includes('sign-in') ||
-            emailSubject.toLowerCase().includes('đăng nhập') ||
-            emailText.toLowerCase().includes('sign in') ||
-            emailText.toLowerCase().includes('đăng nhập')
-        ) {
-            otpType = 'Xác minh đăng nhập';
-            
-            // Đầu tiên tìm OTP (nếu có)
-            const otpMatch = emailText.match(/\b(\d{4,6})\b/);
-            if (otpMatch) {
-              otpCode = otpMatch[1];
-              console.log(`Tìm thấy mã xác minh đăng nhập: ${otpCode}`);
-            }
-            
-            // Sau đó tìm link (nếu có)
+            // Tìm liên kết xác minh
             if (emailHtml) {
-              // Tạo mảng các pattern để tìm URL xác minh đăng nhập
-              const loginVerificationPatterns = [
-                // Pattern 1: Tìm tag <a> với text "Xác nhận đăng nhập"
-                /<a\s+[^>]*href=["']([^"']+)["'][^>]*>(?:Xác nhận|Confirm|Verify|Yes|Đúng)[^<]*<\/a>/i,
-                
-                // Pattern 2: Tìm bất kỳ tag <a> nào trong email có href chứa netflix.com
-                /<a\s+[^>]*href=["']([^"']*?netflix\.com[^"']*)["'][^>]*>/i,
-                
-                // Pattern 3: Tìm bất kỳ URL nào trong email 
-                /href=["']([^"']*?netflix\.com[^"']*)["']/i
+              const householdPatterns = [
+                /href="([^"]*\/update-primary-location[^"]*?)"/i,
+                /href="([^"]*\/account\/update[^"]*?)"/i
               ];
               
-              // Sử dụng hàm trích xuất URL
-              verificationLink = extractUrlsFromHtml(emailHtml, loginVerificationPatterns);
+              verificationLink = extractUrlsFromHtml(emailHtml, householdPatterns);
+              buttonLabel = 'Đúng, đây là tôi';
               
-              if (verificationLink) {
-                console.log(`Đã tìm thấy URL xác minh đăng nhập: ${verificationLink.substring(0, 50)}...`);
+              // Trích xuất thông tin profile (người yêu cầu)
+              const profileMatch = emailText.match(/Do\s+(.*?)\s+yêu cầu|Được yêu cầu bởi\s+(.*?)\s+từ/i);
+              if (profileMatch) {
+                profile = profileMatch[1] || profileMatch[2];
+              }
+              
+              // Trích xuất ghi chú về thời gian hết hạn
+              const noteMatch = emailText.match(/\*\s+(.*?hết hạn.*?)\./i);
+              if (noteMatch) {
+                note = noteMatch[1];
               } else {
-                console.log('Không tìm thấy URL xác minh đăng nhập trong email');
+                const timeMatch = emailText.match(/Liên kết sẽ hết hạn sau\s+(\d+)\s+phút/i);
+                if (timeMatch) {
+                  note = `Liên kết sẽ hết hạn sau ${timeMatch[1]} phút`;
+                }
               }
             }
           }
-          // 5. Kiểm tra các trường hợp còn lại
-          else {
-            // Tìm mã OTP nếu có
-            const otpMatch = emailText.match(/\b(\d{4,6})\b/);
-            if (otpMatch) {
-              otpCode = otpMatch[1];
-              console.log(`Tìm thấy mã OTP: ${otpCode}`);
-            }
+          // 2. Email mã truy cập tạm thời
+          else if (emailText.toLowerCase().includes('mã truy cập tạm thời') || 
+                  emailText.toLowerCase().includes('temporary access code') ||
+                  (emailHtml && /\/travel\/verify/i.test(emailHtml))) {
             
-            // Tìm URL nếu có
+            otpType = 'Xác minh hộ gia đình';
+            shouldSave = true;
+            
+            // Tìm liên kết xác minh
             if (emailHtml) {
-              const verifyUrlRegex = /href=["'](https:\/\/[^"']*?(?:netflix\.com|netflix)[^"']*?)["']/i;
-              const verifyMatch = emailHtml.match(verifyUrlRegex);
+              const tempAccessPatterns = [
+                /href="([^"]*\/travel\/verify[^"]*?)"/i,
+                /href="([^"]*\/account\/travel[^"]*?)"/i
+              ];
               
-              if (verifyMatch && verifyMatch[1]) {
-                verificationLink = verifyMatch[1].replace(/&amp;/g, '&');
-                console.log(`Tìm thấy URL Netflix: ${verificationLink.substring(0, 50)}...`);
+              verificationLink = extractUrlsFromHtml(emailHtml, tempAccessPatterns);
+              buttonLabel = 'Nhận mã';
+              
+              // Trích xuất thông tin profile
+              const profileMatch = emailText.match(/(\d+)\s+thân mến|Được yêu cầu bởi\s+(.*?)\s+từ/i);
+              if (profileMatch) {
+                profile = profileMatch[1] || profileMatch[2];
+              }
+              
+              // Trích xuất ghi chú về thời gian hết hạn
+              const noteMatch = emailText.match(/\*\s+(.*?hết hạn.*?)\./i);
+              if (noteMatch) {
+                note = noteMatch[1];
+              } else {
+                const timeMatch = emailText.match(/Liên kết sẽ hết hạn sau\s+(\d+)\s+phút/i);
+                if (timeMatch) {
+                  note = `Liên kết sẽ hết hạn sau ${timeMatch[1]} phút`;
+                }
               }
             }
-        }
-        
-        // Lưu vào database
-          if (otpCode || verificationLink) {
-            // Với email đặt lại mật khẩu, luôn đảm bảo dùng mã VERIFY (không dùng số ngẫu nhiên)
-            const finalCode = otpType === 'Đặt lại mật khẩu' ? 'VERIFY' : (otpCode || 'VERIFY');
-            
-        await Otp.create({
-              code: finalCode,
-              from: fromEmail,
-          type: otpType,
-          receivedAt: parsed.date,
-              MailAccountId: acc.id,
-              verificationLink: verificationLink
-        });
-        
-            console.log(`Đã lưu thông tin email Netflix - Loại: ${otpType}, Email: ${acc.email}, Từ: ${fromEmail}`);
+          }
+          
+          // Lưu OTP vào database nếu là email xác minh hộ gia đình
+          if (shouldSave && (verificationLink || otpCode)) {
+            try {
+              await Otp.create({
+                MailAccountId: acc.id,
+                code: otpCode,
+                type: otpType,
+                from: emailFrom,
+                verificationLink: verificationLink,
+                buttonLabel: buttonLabel,
+                profile: profile,
+                note: note,
+                receivedAt: new Date()
+              });
+              console.log(`Đã lưu ${otpType} từ ${emailFrom}`);
+            } catch (e) {
+              console.error(`Lỗi khi lưu OTP: ${e.message}`);
+            }
           } else {
-            console.log(`Email từ Netflix nhưng không tìm thấy OTP hoặc liên kết xác minh`);
+            console.log(`Bỏ qua email không phải xác minh hộ gia đình từ: ${emailFrom}`);
           }
         } else {
-          console.log(`Bỏ qua email không liên quan đến Netflix: ${fromEmail}`);
+          console.log(`Bỏ qua email không liên quan đến Netflix: ${emailFrom}`);
         }
       } catch (emailError) {
         console.error(`Lỗi khi xử lý email #${msg.num}:`, emailError.message);
@@ -926,10 +881,34 @@ cron.schedule(`*/${interval} * * * * *`, async () => {
   }
 });
 
-// Khởi động
-(async () => {
-  await sequelize.sync();
-  app.listen(process.env.PORT||3000, ()=>{
-    console.log(`Server chạy tại http://localhost:${process.env.PORT||3000}`);
+// Quản lý Tools
+app.get('/admin/tools', requireLogin, async (req, res) => {
+  const tools = await Tool.findAll({ order: [['id', 'ASC']] });
+  res.render('admin-tools', { tools, err: null, success: null, title: 'Quản Lý Tools' });
+});
+
+// Toggle bật/tắt tool
+app.post('/admin/tools/toggle/:id', requireLogin, async (req, res) => {
+  try {
+    const tool = await Tool.findByPk(req.params.id);
+    if (tool) {
+      await tool.update({ enabled: !tool.enabled });
+    }
+    res.redirect('/admin/tools');
+  } catch (e) {
+    const tools = await Tool.findAll();
+    res.render('admin-tools', { tools, err: e.message, success: null, title: 'Quản Lý Tools' });
+  }
+});
+
+// Khởi động server
+const PORT = process.env.PORT || 3000;
+// Không đồng bộ hóa database tự động
+// sequelize.sync({ alter: true }).then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server đang chạy trên cổng ${PORT}`);
   });
-})();
+// }).catch(err => console.error('Lỗi đồng bộ database:', err));
+
+// Lên lịch chạy cron job để kiểm tra email
+// ... existing code ...

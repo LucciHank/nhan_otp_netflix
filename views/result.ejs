@@ -55,7 +55,15 @@
             const received = new Date(otps[0].receivedAt);
             const diffMs = now - received;
             const diffMins = Math.floor(diffMs / 60000);
-            const expiresInMins = 30 - diffMins;
+            // Sử dụng thông tin hết hạn từ note nếu có
+            let expiresInMins = 30 - diffMins;
+            if (otps[0].note && otps[0].note.match(/hết hạn sau\s+(\d+)\s+phút/i)) {
+              const noteTimeMatch = otps[0].note.match(/hết hạn sau\s+(\d+)\s+phút/i);
+              if (noteTimeMatch && noteTimeMatch[1]) {
+                const noteExpireTime = parseInt(noteTimeMatch[1]);
+                expiresInMins = noteExpireTime - diffMins;
+              }
+            }
           %>
           <% if (expiresInMins > 0) { %>
             <span class="bg-green-800 text-green-200 px-2 py-1 rounded text-xs">
@@ -83,15 +91,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <% if (otps[0].type.toLowerCase().includes('mật khẩu')) { %>
-                      Đặt lại mật khẩu
-                    <% } else if (otps[0].type.toLowerCase().includes('hộ gia đình')) { %>
-                      Đúng, đây là tôi
-                    <% } else if (otps[0].type.toLowerCase().includes('đăng nhập')) { %>
-                      Xác nhận đăng nhập
-                    <% } else { %>
-                      Nhấn vào đây
-                    <% } %>
+                    <%= otps[0].buttonLabel || (otps[0].type.toLowerCase().includes('mật khẩu') ? 'Đặt lại mật khẩu' : (otps[0].type.toLowerCase().includes('hộ gia đình') ? 'Đúng, đây là tôi' : (otps[0].type.toLowerCase().includes('đăng nhập') ? 'Xác nhận đăng nhập' : 'Nhấn vào đây'))) %>
                   </a>
                   <button 
                     class="ml-3 p-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors" 
@@ -124,6 +124,12 @@
                   <%= otps[0].type %>
                 </span>
               </p>
+              <% if (otps[0].profile) { %>
+                <p class="text-sm text-gray-300 mt-1">Profile: <span class="font-medium"><%= otps[0].profile %></span></p>
+              <% } %>
+              <% if (otps[0].note) { %>
+                <p class="text-sm text-gray-400 mt-1 italic"><%= otps[0].note %></p>
+              <% } %>
             </div>
             <div class="text-right">
               <p class="text-sm text-gray-400 mb-1">Thời gian nhận:</p>
@@ -152,10 +158,11 @@
             <thead>
               <tr>
                 <th class="w-1/4">Mã OTP/Xác minh</th>
-                <th class="w-1/5">Loại</th>
-                <th class="w-1/5">Người gửi</th>
-                <th class="w-1/5">Thời gian</th>
-                <th class="w-1/5">Trạng thái</th>
+                <th class="w-1/6">Profile</th>
+                <th class="w-1/6">Loại</th>
+                <th class="w-1/6">Người gửi</th>
+                <th class="w-1/6">Thời gian</th>
+                <th class="w-1/6">Trạng thái</th>
               </tr>
             </thead>
             <tbody>
@@ -164,22 +171,23 @@
                 const received = new Date(otp.receivedAt);
                 const diffMs = now - received;
                 const diffMins = Math.floor(diffMs / 60000);
-                const expiresInMins = 30 - diffMins;
+                
+                // Sử dụng thông tin hết hạn từ note nếu có
+                let expiresInMins = 30 - diffMins;
+                if (otp.note && otp.note.match(/hết hạn sau\s+(\d+)\s+phút/i)) {
+                  const noteTimeMatch = otp.note.match(/hết hạn sau\s+(\d+)\s+phút/i);
+                  if (noteTimeMatch && noteTimeMatch[1]) {
+                    const noteExpireTime = parseInt(noteTimeMatch[1]);
+                    expiresInMins = noteExpireTime - diffMins;
+                  }
+                }
               %>
                 <tr>
                   <td class="otp-code">
                     <div class="flex items-center">
                       <% if (otp.verificationLink) { %>
                         <a href="<%= otp.verificationLink %>" target="_blank" class="text-netflix-red hover:text-red-400 underline">
-                          <% if (otp.type.toLowerCase().includes('mật khẩu')) { %>
-                            Đặt lại mật khẩu
-                          <% } else if (otp.type.toLowerCase().includes('hộ gia đình')) { %>
-                            Đúng, đây là tôi
-                          <% } else if (otp.type.toLowerCase().includes('đăng nhập')) { %>
-                            Xác nhận đăng nhập
-                          <% } else { %>
-                            Nhấn vào đây
-                          <% } %>
+                          <%= otp.buttonLabel || (otp.type.toLowerCase().includes('mật khẩu') ? 'Đặt lại mật khẩu' : (otp.type.toLowerCase().includes('hộ gia đình') ? 'Đúng, đây là tôi' : (otp.type.toLowerCase().includes('đăng nhập') ? 'Xác nhận đăng nhập' : 'Nhấn vào đây'))) %>
                         </a>
                         <button 
                           class="ml-2 p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors" 
@@ -204,6 +212,7 @@
                       <% } %>
                     </div>
                   </td>
+                  <td><%= otp.profile || '-' %></td>
                   <td>
                     <span class="<%= 
                       otp.type.toLowerCase().includes('hộ gia đình') ? 'bg-blue-900/70 text-blue-200' : 
@@ -215,7 +224,7 @@
                   </td>
                   <td>
                     <span class="text-xs">
-                      <%= otp.from.includes('<') ? otp.from.split('<')[0].trim() : otp.from %>
+                      <%= otp.from && otp.from.includes('<') ? otp.from.split('<')[0].trim() : (otp.from || '') %>
                     </span>
                   </td>
                   <td class="otp-time"><%= otp.receivedAt.toLocaleString() %></td>

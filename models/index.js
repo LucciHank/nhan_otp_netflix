@@ -31,8 +31,9 @@ if (process.env.DATABASE_URL) {
 
 const MailAccount = require('./mailAccount')(sequelize);
 const Otp = require('./otp')(sequelize);
+const Tool = require('./tool')(sequelize);
 
 // Quan hệ nếu cần
 Otp.belongsTo(MailAccount);
 
-module.exports = { sequelize, MailAccount, Otp };
+module.exports = { sequelize, MailAccount, Otp, Tool };

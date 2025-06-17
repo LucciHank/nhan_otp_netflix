@@ -114,14 +114,13 @@
       <div class="app-logo">
         <a href="/" class="flex items-center">
           <img src="/img/tomoi-logo.svg" alt="TomOi.vn" class="h-10 mr-2">
-          <span>×</span>
-          <img src="/img/netflix-logo.svg" alt="Netflix" class="h-8 ml-2">
         </a>
       </div>
       <% if (typeof req !== 'undefined' && req.session && req.session.user) { %>
         <div class="flex items-center space-x-4">
           <a href="/admin/dashboard" class="text-white hover:text-gray-300">Dashboard</a>
           <a href="/admin/accounts" class="text-white hover:text-gray-300">Tài khoản</a>
+          <a href="/admin/tools" class="text-white hover:text-gray-300">Tools</a>
           <span class="text-gray-400">|</span>
           <a href="/admin/logout" class="text-white hover:text-gray-300">Đăng xuất</a>
     </div>
