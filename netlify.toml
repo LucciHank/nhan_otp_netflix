@@ -1,20 +1,17 @@
 [build]
-  publish = "public"
+  publish = "netlify/functions/server/public"
   functions = "netlify/functions"
 
 [dev]
-  command = "npm run dev"
+  command = "node netlify/functions/server/app.js"
   port = 3000
-  publish = "public"
+  publish = "netlify/functions/server/public"
   targetPort = 3000
 
 [[redirects]]
   from = "/*"
-  to = "/.netlify/functions/server"
+  to = "/.netlify/functions/server/:splat"
   status = 200
 
 [functions]
-  included_files = ["!netlify/functions/server/node_modules/**"]
-  [functions.server]
-    node_bundler = "esbuild"
-    included_files = ["views/**", "public/**", "models/**"] 
+  included_files = ["netlify/functions/server/**"] 
