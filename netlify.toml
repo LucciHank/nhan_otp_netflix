@@ -14,4 +14,7 @@
   status = 200
 
 [functions]
-  node_bundler = "esbuild" 
+  included_files = ["!netlify/functions/server/node_modules/**"]
+  [functions.server]
+    node_bundler = "esbuild"
+    included_files = ["views/**", "public/**", "models/**"] 
