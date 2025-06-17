@@ -7,7 +7,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "postinstall": "npm rebuild sqlite3",
-    "build": "npm install"
+    "build": "npm install && npm run build:functions",
+    "build:functions": "netlify-lambda build netlify/functions",
+    "serve": "netlify dev"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -22,9 +24,13 @@
     "pg": "^8.16.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.33.0",
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.6",
+    "serverless-http": "^3.2.0",
+    "@netlify/functions": "^2.4.0"
   },
   "devDependencies": {
+    "netlify-cli": "^17.11.1",
+    "netlify-lambda": "^2.0.16",
     "nodemon": "^3.0.1"
   }
 }
