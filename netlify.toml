@@ -1,5 +1,4 @@
 [build]
-  command = "npm run build"
   publish = "public"
   functions = "netlify/functions"
 
@@ -7,6 +6,7 @@
   command = "npm run dev"
   port = 3000
   publish = "public"
+  targetPort = 3000
 
 [[redirects]]
   from = "/*"
@@ -14,7 +14,4 @@
   status = 200
 
 [functions]
-  node_bundler = "esbuild"
-
-[build.environment]
-  NODE_VERSION = "18" 
+  node_bundler = "esbuild" 

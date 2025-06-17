@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "postinstall": "npm rebuild sqlite3",
-    "build": "echo 'No build step required'",
+    "build": "echo 'Build step not required for Netlify functions'",
     "serve": "netlify dev"
   },
   "dependencies": {
