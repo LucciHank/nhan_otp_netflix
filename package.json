@@ -7,8 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "postinstall": "npm rebuild sqlite3",
-    "build": "npm install && npm run build:functions",
-    "build:functions": "netlify-lambda build netlify/functions",
+    "build": "echo 'No build step required'",
     "serve": "netlify dev"
   },
   "dependencies": {
@@ -30,7 +29,6 @@
   },
   "devDependencies": {
     "netlify-cli": "^17.11.1",
-    "netlify-lambda": "^2.0.16",
     "nodemon": "^3.0.1"
   }
 }
