@@ -28,18 +28,29 @@ app.use(session({
   cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 
-// Đồng bộ database
-sequelize.sync({ alter: true })
+// Kiểm tra kết nối database
+sequelize.authenticate()
+  .then(() => {
+    console.log('Kết nối đến database thành công.');
+    
+    // Đồng bộ database
+    return sequelize.sync({ alter: true });
+  })
   .then(() => {
     console.log('Database đã được đồng bộ hóa');
   })
   .catch(err => {
-    console.error('Lỗi đồng bộ database:', err);
+    console.error('Lỗi kết nối database:', err);
   });
 
 // Các routes
 app.get('/', (req, res) => {
   res.render('home', { title: 'Trang Chủ' });
+});
+
+// API endpoint để kiểm tra kết nối
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Server đang hoạt động' });
 });
 
 // Thêm các routes khác ở đây
