@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 const { sequelize } = require('./models');
@@ -13,7 +14,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Thiết lập EJS
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// Tính toán đường dẫn tới thư mục views một cách linh hoạt
+let viewsDir = path.join(__dirname, 'views');
+if (!fs.existsSync(viewsDir)) {
+  // Khi chạy dưới dạng Netlify Function, __dirname có thể là netlify/functions
+  viewsDir = path.join(__dirname, 'server', 'views');
+}
+app.set('views', viewsDir);
 app.use(expressLayouts);
 app.set('layout', 'layouts/main');
 
