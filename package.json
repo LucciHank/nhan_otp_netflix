@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "postinstall": "node ./node_modules/better-sqlite3/deps/download.js",
-    "build": "npm install"
+    "postinstall": "",
+    "prebuild": "npm install",
+    "build": "echo 'Build completed'"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
