@@ -1,36 +1,5 @@
-# Thư mục node_modules
 node_modules/
-
-# Các file môi trường
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# File cơ sở dữ liệu
-*.sqlite
-*.sqlite3
-*.db
-
-# Các file log
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Thư mục build
-/build
-/dist
-/.netlify
-
-# Các file hệ thống
 .DS_Store
-Thumbs.db
-
-# Các file IDE
-.idea/
-.vscode/
-*.swp
-*.swo 
+data.sqlite
+data/*.sqlite 

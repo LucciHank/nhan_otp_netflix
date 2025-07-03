@@ -1,0 +1,50 @@
+<div class="max-w-5xl mx-auto">
+  <h1 class="text-2xl font-bold mb-6">Quản Lý Tools</h1>
+
+  <% if (err) { %>
+    <div class="bg-red-800/60 text-red-200 p-3 rounded mb-4"><%= err %></div>
+  <% } %>
+  <% if (success) { %>
+    <div class="bg-green-800/60 text-green-200 p-3 rounded mb-4"><%= success %></div>
+  <% } %>
+
+  <table class="w-full text-left">
+    <thead>
+      <tr>
+        <th class="py-2 px-3 border-b border-gray-700">#</th>
+        <th class="py-2 px-3 border-b border-gray-700">Tên</th>
+        <th class="py-2 px-3 border-b border-gray-700">Badge</th>
+        <th class="py-2 px-3 border-b border-gray-700">Trạng thái</th>
+        <th class="py-2 px-3 border-b border-gray-700 text-center">Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% tools.forEach((tool, idx) => { %>
+        <tr class="hover:bg-gray-800/50">
+          <td class="py-2 px-3"><%= idx + 1 %></td>
+          <td class="py-2 px-3 font-medium flex items-center gap-2">
+            <% if (tool.image) { %>
+              <img src="<%= tool.image %>" alt="" class="h-6 w-6 object-contain">
+            <% } %>
+            <%= tool.name %>
+          </td>
+          <td class="py-2 px-3"><%= tool.badge %></td>
+          <td class="py-2 px-3">
+            <% if (tool.enabled) { %>
+              <span class="text-green-400">Bật</span>
+            <% } else { %>
+              <span class="text-red-400">Tắt</span>
+            <% } %>
+          </td>
+          <td class="py-2 px-3 text-center">
+            <form action="/admin/tools/toggle/<%= tool.id %>" method="post">
+              <button type="submit" class="bg-netflix-red hover:bg-red-700 text-white text-sm px-3 py-1 rounded">
+                <% if (tool.enabled) { %>Tắt<% } else { %>Bật<% } %>
+              </button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div> 

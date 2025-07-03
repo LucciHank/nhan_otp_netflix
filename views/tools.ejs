@@ -1,0 +1,76 @@
+<div class="max-w-6xl mx-auto">
+  <div class="text-center mb-12 animate-fade-in">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+      <span class="gradient-text">Danh Sách Công Cụ</span>
+    </h1>
+    <p class="text-xl text-gray-300 font-light max-w-2xl mx-auto">Chọn công cụ bạn cần sử dụng từ danh sách dưới đây</p>
+  </div>
+
+  <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in delay-100">
+    <% if (tools.length === 0) { %>
+      <div class="col-span-full text-center py-16 glass-effect">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-netflix-light text-xl font-bold mb-2">Hiện chưa có công cụ nào</p>
+        <p class="text-gray-400 max-w-md mx-auto">Chúng tôi đang phát triển các công cụ mới. Vui lòng quay lại sau.</p>
+      </div>
+    <% } %>
+
+    <% tools.forEach(tool => { %>
+      <% const clickable = tool.enabled ? 'a' : 'div'; %>
+      <<%= clickable %> href="<%= tool.enabled ? '/' + tool.slug : '#' %>" class="relative block transform transition-all duration-300 hover:-translate-y-2 group">
+        <div class="card overflow-hidden h-full border border-gray-800 hover:border-gray-700 transition-all">
+          <% if (tool.image) { %>
+            <div class="bg-gradient-to-br from-gray-900 to-black p-6 flex items-center justify-center">
+              <img src="<%= tool.image %>" alt="<%= tool.name %>" class="w-full h-40 object-contain filter drop-shadow-lg transition-transform duration-500 group-hover:scale-105">
+            </div>
+          <% } else { %>
+            <div class="bg-gradient-to-br from-gray-900 to-black p-6 flex items-center justify-center h-40">
+              <div class="feature-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-netflix-red" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+            </div>
+          <% } %>
+          <div class="card-body">
+            <h3 class="text-xl font-semibold mb-3 group-hover:text-netflix-red transition-colors duration-300"><%= tool.name %></h3>
+            <% if (tool.badge) { %>
+              <span class="badge badge-info"><%= tool.badge %></span>
+            <% } %>
+            <% if (tool.enabled) { %>
+              <div class="mt-4 flex justify-between items-center">
+                <span class="badge badge-success">Khả dụng</span>
+                <span class="text-sm text-gray-400 group-hover:text-white transition-colors duration-300 flex items-center">
+                  Sử dụng ngay
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </div>
+            <% } %>
+          </div>
+        </div>
+        <% if (!tool.enabled) { %>
+          <div class="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
+            <div class="text-center p-4">
+              <span class="badge badge-danger mb-2">Tạm ngừng</span>
+              <p class="text-white font-medium">Chức năng này hiện không khả dụng</p>
+            </div>
+          </div>
+        <% } %>
+      </<%= clickable %>>
+    <% }) %>
+  </div>
+  
+  <div class="mt-16 text-center animate-fade-in delay-200">
+    <p class="text-gray-400 mb-4">Không tìm thấy công cụ bạn cần?</p>
+    <a href="/" class="btn btn-secondary">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+      Quay về trang chủ
+    </a>
+  </div>
+</div> 

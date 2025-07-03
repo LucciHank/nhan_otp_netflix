@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Hệ Thống Nhận OTP Netflix' %></title>
+  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/base64-images.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            netflix: {
+              red: '#E50914',
+              dark: '#121212',
+              light: '#F5F5F1'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'SF Pro Text', 'Helvetica Neue', 'Arial', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #000;
+      background-image: radial-gradient(circle at center, #1A1A1A 0%, #0F0F0F 50%, #000000 100%);
+      min-height: 100vh;
+      color: #F5F5F1;
+      font-family: 'Inter', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .text-netflix-red {
+      color: #E50914;
+    }
+    
+    .text-netflix-light {
+      color: #F5F5F1;
+    }
+    
+    .bg-netflix-dark {
+      background-color: #121212;
+    }
+    
+    .bg-netflix-red {
+      background-color: #E50914;
+    }
+    
+    .main-container {
+      min-height: calc(100vh - 150px);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .footer {
+      height: 70px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #757575;
+      font-size: 0.8rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+    }
+    
+    /* App logo styling */
+    .app-logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      color: #E50914;
+      text-shadow: 0 0 10px rgba(229, 9, 20, 0.3);
+    }
+    
+    .header {
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .card {
+      background-color: rgba(20, 20, 20, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      border: 1px solid rgba(229, 9, 20, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    }
+    
+    .card-header {
+      background-color: rgba(0, 0, 0, 0.4);
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid rgba(229, 9, 20, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-body {
+      padding: 1.75rem;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #0071e3;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 980px;
+      font-weight: 500;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0, 113, 227, 0.3);
+    }
+    
+    .btn:hover {
+      background-color: #0077ED;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 113, 227, 0.4);
+    }
+    
+    .btn-red {
+      background-color: #E50914;
+      box-shadow: 0 2px 8px rgba(229, 9, 20, 0.3);
+    }
+    
+    .btn-red:hover {
+      background-color: #f30913;
+      box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+    }
+    
+    .btn-secondary {
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      box-shadow: none;
+    }
+    
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      box-shadow: none;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.6s ease forwards;
+    }
+    
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(90deg, #E50914, #FF6B6B);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+    
+    .mascot-image {
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+      transition: transform 0.3s ease;
+    }
+    
+    .mascot-image:hover {
+      transform: translateY(-8px) scale(1.05);
+    }
+  </style>
+  <%- typeof extractStyles !== 'undefined' ? extractStyles : '' %>
+</head>
+<body class="bg-netflix-dark text-netflix-light">
+  <header class="header shadow-md py-3">
+    <div class="container mx-auto flex justify-between items-center px-4">
+      <div class="app-logo">
+        <a href="/" class="flex items-center">
+          <img src="/img/tomoi-logo.svg" alt="TomOi.vn" class="h-10 mr-2">
+        </a>
+      </div>
+      <% if (typeof req !== 'undefined' && req.session && req.session.user) { %>
+        <div class="flex items-center space-x-6">
+          <a href="/admin/dashboard" class="text-white hover:text-gray-300 text-sm font-medium transition duration-200">Dashboard</a>
+          <a href="/admin/accounts" class="text-white hover:text-gray-300 text-sm font-medium transition duration-200">Tài khoản</a>
+          <a href="/admin/tools" class="text-white hover:text-gray-300 text-sm font-medium transition duration-200">Tools</a>
+          <span class="text-gray-600">|</span>
+          <a href="/admin/logout" class="text-white hover:text-gray-300 text-sm font-medium transition duration-200">Đăng xuất</a>
+        </div>
+      <% } %>
+    </div>
+  </header>
+
+  <main class="main-container container mx-auto animate-fade-in">
+    <%- body %>
+  </main>
+  
+  <footer class="footer mt-8 py-5">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; <%= new Date().getFullYear() %> TomOi.vn - Hệ thống nhận OTP Netflix hộ gia đình</p>
+    </div>
+  </footer>
+  
+  <%- typeof extractScripts !== 'undefined' ? extractScripts : '' %>
+</body>
+</html>
